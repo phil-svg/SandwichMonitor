@@ -128,7 +128,9 @@ export async function buildSandwichMessage(sandwich) {
     const POOL_NAME = sandwich.poolName;
     const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
     let labelName = sandwich.label;
-    let CENTER_TX_HASH_URL_ETHERSCAN, centerAmountOut, centerCoinOutUrl, centerNameOut, centerAmountIn, centerCoinInUrl, centerNameIn;
+    let CENTER_TX_HASH_URL_ETHERSCAN, centerAmountOut, centerNameOut, centerAmountIn, centerNameIn;
+    let centerCoinInUrl = "";
+    let centerCoinOutUrl = "";
     const FRONTRUN_TX_HASH_URL_ETHERSCAN = getTxHashURLfromEtherscan(sandwich.frontrun.tx_hash);
     let frontrunAmountOut = sandwich.frontrun.coins_leaving_wallet[0].amount;
     let frontrunCoinOutUrl = getTokenURL(sandwich.frontrun.coins_leaving_wallet[0].address);
@@ -195,27 +197,6 @@ ${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmoun
 Called Contract: ${LABEL}
 ......
 
-`;
-}
-export async function buildDepositMessage(formattedEventData) {
-    let { crvUSD_price, borrowerHealth, marketCap, qtyCollat, collatValue, marketBorrowedAmount, collateralAddress, collateralName, borrowedAmount, txHash, buyer, crvUSDinCirculation, borrowRate, } = formattedEventData;
-    const buyerURL = getBuyerURL(buyer);
-    const shortenBuyer = getAddressName(buyer);
-    const COLLATERAL_URL = getTokenURL(collateralAddress);
-    const TX_HASH_URL_ETHERSCAN = getTxHashURLfromEtherscan(txHash);
-    const TX_HASH_URL_EIGENPHI = getTxHashURLfromEigenPhi(txHash);
-    borrowedAmount = formatForPrint(borrowedAmount);
-    crvUSDinCirculation = formatForPrint(crvUSDinCirculation);
-    let marketHealthPrint = getMarketHealthPrint(qtyCollat, collateralName, collatValue, marketBorrowedAmount);
-    if (borrowerHealth !== "no loan")
-        borrowerHealth = formatForPrint(borrowerHealth * 100);
-    return `
-  🚀${hyperlink(buyerURL, shortenBuyer)} deposited ${borrowedAmount}${hyperlink(COLLATERAL_URL, collateralName)}
-Health of Borrower: ${borrowerHealth}
-Borrow Rate: ${formatForPrint(borrowRate)}%
-${marketHealthPrint}
-Marketcap: ${getShortenNumber(formatForPrint(marketCap))}  | Total borrowed: ${getShortenNumber(formatForPrint(crvUSDinCirculation))} | Price: ${crvUSD_price.toFixed(4)}  
-Links:${hyperlink(TX_HASH_URL_ETHERSCAN, "etherscan.io")} |${hyperlink(TX_HASH_URL_EIGENPHI, "eigenphi.io")} 🦙🦙🦙
 `;
 }
 export async function telegramBotMain(env, eventEmitter) {
