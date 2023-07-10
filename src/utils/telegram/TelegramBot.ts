@@ -241,7 +241,6 @@ export async function telegramBotMain(env: string, eventEmitter: EventEmitter) {
   const bot = new TelegramBot(telegramGroupToken!, { polling: true });
 
   bot.on("message", async (msg) => {
-    console.log("msg", msg, "groupID", groupID, "msg.chat.id", msg.chat.id);
     if (msg.text === "bot u with us") {
       await new Promise((resolve) => setTimeout(resolve, 850));
       if (groupID) {
