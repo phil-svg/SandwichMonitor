@@ -199,8 +199,6 @@ export async function buildSandwichMessage(sandwich: any) {
   }
 
   return `
-
-  ......
 Sandwich spotted in${POOL}
 
 ${hyperlink(FRONTRUN_TX_HASH_URL_ETHERSCAN, "Frontrun")}: ${formatForPrint(frontrunAmountOut)}${hyperlink(frontrunCoinOutUrl, frontrunNameOut)} ➛ ${formatForPrint(
@@ -214,8 +212,6 @@ ${hyperlink(BACKRUN_TX_HASH_URL_ETHERSCAN, "Backrun")}: ${formatForPrint(backrun
 Affected Contract: ${LABEL}
 
 ${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's -${percentage}% slippage)
-......
-
 `;
 }
 
