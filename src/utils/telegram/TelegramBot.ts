@@ -211,9 +211,9 @@ ${hyperlink(BACKRUN_TX_HASH_URL_ETHERSCAN, "Backrun")}: ${formatForPrint(backrun
     backrunAmountIn
   )}${hyperlink(backrunCoinInUrl, backrunNameIn)}
 
-${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's ${percentage}%)
+Affected Contract: ${LABEL}
 
-Called Contract: ${LABEL}
+${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's -${percentage}% slippage)
 ......
 
 `;

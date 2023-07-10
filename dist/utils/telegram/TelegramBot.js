@@ -192,9 +192,9 @@ ${hyperlink(FRONTRUN_TX_HASH_URL_ETHERSCAN, "Frontrun")}: ${formatForPrint(front
 ${centerMessage}
 ${hyperlink(BACKRUN_TX_HASH_URL_ETHERSCAN, "Backrun")}: ${formatForPrint(backrunAmountOut)}${hyperlink(backrunCoinOutUrl, backrunNameOut)} ➛ ${formatForPrint(backrunAmountIn)}${hyperlink(backrunCoinInUrl, backrunNameIn)}
 
-${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's ${percentage}%)
+Affected Contract: ${LABEL}
 
-Called Contract: ${LABEL}
+${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's -${percentage}% slippage)
 ......
 
 `;
