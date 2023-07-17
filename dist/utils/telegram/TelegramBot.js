@@ -184,8 +184,6 @@ export async function buildSandwichMessage(sandwich) {
         centerMessage = `${hyperlink(CENTER_TX_HASH_URL_ETHERSCAN, "Center")}: removed ${formatForPrint(centerAmountOut)}${hyperlink(centerCoinOutUrl, centerNameOut)}`;
     }
     return `
-
-  ......
 Sandwich spotted in${POOL}
 
 ${hyperlink(FRONTRUN_TX_HASH_URL_ETHERSCAN, "Frontrun")}: ${formatForPrint(frontrunAmountOut)}${hyperlink(frontrunCoinOutUrl, frontrunNameOut)} ➛ ${formatForPrint(frontrunAmountIn)}${hyperlink(frontrunCoinInUrl, frontrunNameIn)}
@@ -195,8 +193,6 @@ ${hyperlink(BACKRUN_TX_HASH_URL_ETHERSCAN, "Backrun")}: ${formatForPrint(backrun
 Affected Contract: ${LABEL}
 
 ${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's -${percentage}% slippage)
-......
-
 `;
 }
 export async function telegramBotMain(env, eventEmitter) {
