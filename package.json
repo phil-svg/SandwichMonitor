@@ -5,7 +5,10 @@
   "main": "SandwichMonitorBot.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "cd dist && node SandwichMonitorBot.js",
+    "code": "tsc && cd dist && node SandwichMonitorBot.js"
   },
   "author": "phil",
   "license": "MIT",
@@ -20,13 +23,13 @@
     "fs": "^0.0.1-security",
     "node-telegram-bot-api": "^0.61.0",
     "socket.io-client": "^4.7.1",
-    "typescript": "^5.0.4",
     "web3": "^1.9.0",
     "web3-eth-contract": "^1.9.0"
   },
   "devDependencies": {
     "@types/big.js": "^6.1.6",
     "@types/node-telegram-bot-api": "^0.61.6",
-    "copyfiles": "^2.4.1"
+    "copyfiles": "^2.4.1",
+    "typescript": "^5.1.6"
   }
 }

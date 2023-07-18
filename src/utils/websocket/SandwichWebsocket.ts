@@ -1,3 +1,4 @@
+import { priceTransaction } from "../../txValue/PriceTransaction.js";
 import { buildSandwichMessage } from "../../utils/telegram/TelegramBot.js";
 import { io, Socket } from "socket.io-client";
 
@@ -12,9 +13,9 @@ export async function connectToWebsocket(eventEmitter: any) {
     mainSocket.emit("connectToGeneralSandwichLivestream");
 
     mainSocket.on("NewSandwich", async (enrichedSandwich: any) => {
-      console.log("Received result: ", enrichedSandwich);
-      const message = await buildSandwichMessage(enrichedSandwich);
-      console.log("message", message);
+      // console.log("Received result: ", enrichedSandwich);
+      const value = await priceTransaction(enrichedSandwich.center[0]);
+      const message = await buildSandwichMessage(enrichedSandwich, value);
       eventEmitter.emit("newMessage", message);
     });
   });

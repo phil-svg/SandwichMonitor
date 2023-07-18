@@ -24,21 +24,6 @@ function getBuyerURL(buyerAddress: string) {
   return "https://etherscan.io/address/" + buyerAddress;
 }
 
-function getProfitPrint(profit: any, revenue: any, cost: any) {
-  // if (Number(revenue) < Number(cost)) {
-  //   return `Profit: ? | Revenue: ? | Cost: $${formatForPrint(cost)}`;
-  // }
-  if (profit > revenue * 0.5) return `Revenue: ¯⧵_(ツ)_/¯`;
-  return `Profit: $${formatForPrint(profit)} | Revenue: $${formatForPrint(revenue)} | Cost: $${formatForPrint(cost)}`;
-}
-
-function getMarketHealthPrint(qtyCollat: number, collateralName: string, collatValue: number, marketBorrowedAmount: number) {
-  collatValue = formatForPrint(collatValue);
-  marketBorrowedAmount = formatForPrint(marketBorrowedAmount);
-  qtyCollat = formatForPrint(qtyCollat);
-  return `Collateral: ${getShortenNumber(qtyCollat)} ${collateralName}${getDollarAddOn(collatValue)} | Borrowed: ${getShortenNumber(marketBorrowedAmount)} crvUSD`;
-}
-
 function formatForPrint(someNumber: any) {
   if (typeof someNumber === "string" && someNumber.includes(",")) return someNumber;
   //someNumber = Math.abs(someNumber);
@@ -132,7 +117,7 @@ function getAddressName(address: string): string {
   return labelObject ? labelObject.Label : shortenAddress(address);
 }
 
-export async function buildSandwichMessage(sandwich: any) {
+export async function buildSandwichMessage(sandwich: any, value: any) {
   const POOL_URL_ETHERSCAN = getPoolURL(sandwich.poolAddress);
   const POOL_NAME = sandwich.poolName;
   const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
@@ -198,6 +183,20 @@ export async function buildSandwichMessage(sandwich: any) {
     centerMessage = `${hyperlink(CENTER_TX_HASH_URL_ETHERSCAN, "Center")}: removed ${formatForPrint(centerAmountOut)}${hyperlink(centerCoinOutUrl!, centerNameOut)}`;
   }
 
+  let lossStatement;
+  if (value && !isNaN(value)) {
+    const monetaryLoss = (percentage / 100) * value;
+    lossStatement = `${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(
+      lostCoinOutUrl,
+      lostCoinNameOut
+    )} (that's -${percentage}% slippage, or $${monetaryLoss.toFixed(2)})`;
+  } else {
+    lossStatement = `${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(
+      lostCoinOutUrl,
+      lostCoinNameOut
+    )} (that's -${percentage}% slippage)`;
+  }
+
   return `
 Sandwich spotted in${POOL}
 
@@ -211,7 +210,7 @@ ${hyperlink(BACKRUN_TX_HASH_URL_ETHERSCAN, "Backrun")}: ${formatForPrint(backrun
 
 Affected Contract: ${LABEL}
 
-${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's -${percentage}% slippage)
+${lossStatement}
 `;
 }
 
