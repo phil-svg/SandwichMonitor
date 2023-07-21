@@ -1,6 +1,5 @@
-import { priceTransaction } from "../../txValue/PriceTransaction.js";
 import { buildSandwichMessage } from "../../utils/telegram/TelegramBot.js";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 
 //const url = "http://localhost:443";
 const url = "wss://api.curvemonitor.com";
@@ -12,10 +11,9 @@ export async function connectToWebsocket(eventEmitter: any) {
     console.log("connected");
     mainSocket.emit("connectToGeneralSandwichLivestream");
 
-    mainSocket.on("NewSandwich", async (enrichedSandwich: any) => {
+    mainSocket.on("NewSandwich", async (sandwichDetails: any) => {
       // console.log("Received result: ", enrichedSandwich);
-      const value = await priceTransaction(enrichedSandwich.center[0]);
-      const message = await buildSandwichMessage(enrichedSandwich, value);
+      const message = await buildSandwichMessage(sandwichDetails);
       eventEmitter.emit("newMessage", message);
     });
   });

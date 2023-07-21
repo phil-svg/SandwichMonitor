@@ -7,9 +7,9 @@ export async function connectToWebsocket(eventEmitter) {
     mainSocket.on("connect", () => {
         console.log("connected");
         mainSocket.emit("connectToGeneralSandwichLivestream");
-        mainSocket.on("NewSandwich", async (enrichedSandwich) => {
+        mainSocket.on("NewSandwich", async (sandwichDetails) => {
             // console.log("Received result: ", enrichedSandwich);
-            const message = await buildSandwichMessage(enrichedSandwich, "foo");
+            const message = await buildSandwichMessage(sandwichDetails);
             eventEmitter.emit("newMessage", message);
         });
     });

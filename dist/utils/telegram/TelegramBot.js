@@ -109,7 +109,8 @@ function getAddressName(address) {
     // If label found, return it. Otherwise, return shortened address
     return labelObject ? labelObject.Label : shortenAddress(address);
 }
-export async function buildSandwichMessage(sandwich, value) {
+export async function buildSandwichMessage(sandwich) {
+    let value = sandwich.lossInUsd;
     const POOL_URL_ETHERSCAN = getPoolURL(sandwich.poolAddress);
     const POOL_NAME = sandwich.poolName;
     const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
