@@ -2,6 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import { EventEmitter } from "events";
 import { labels } from "../../Labels.js";
+import { SandwichDetail } from "../websocket/SandwichWebsocket.js";
 dotenv.config({ path: "../.env" });
 
 function getTokenURL(tokenAddress: string): string {
@@ -117,8 +118,8 @@ function getAddressName(address: string): string {
   return labelObject ? labelObject.Label : shortenAddress(address);
 }
 
-export async function buildSandwichMessage(sandwich: any) {
-  let value = parseFloat(sandwich.lossInUsd);
+export async function buildSandwichMessage(sandwich: SandwichDetail) {
+  let value = sandwich.lossInUsd;
   const POOL_URL_ETHERSCAN = getPoolURL(sandwich.poolAddress);
   const POOL_NAME = sandwich.poolName;
   const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
@@ -175,21 +176,26 @@ export async function buildSandwichMessage(sandwich: any) {
 
   let centerMessage;
   if (sandwich.center[0].transaction_type === "swap") {
+    let centerNameOut = sandwich.center[0].coins_leaving_wallet[0]?.name ?? "";
+    let centerNameIn = sandwich.center[0].coins_entering_wallet[0]?.name ?? "";
     centerMessage = `${hyperlink(CENTER_TX_HASH_URL_ETHERSCAN, "Center")}: ${formatForPrint(centerAmountOut)}${hyperlink(centerCoinOutUrl!, centerNameOut)} ➛ ${formatForPrint(
       centerAmountIn
     )}${hyperlink(centerCoinInUrl!, centerNameIn)}`;
   } else if (sandwich.center[0].transaction_type === "deposit") {
+    let centerNameIn = sandwich.center[0].coins_entering_wallet[0]?.name ?? "";
     centerMessage = `${hyperlink(CENTER_TX_HASH_URL_ETHERSCAN, "Center")}: deposited ${formatForPrint(centerAmountIn)}${hyperlink(centerCoinInUrl!, centerNameIn)}`;
   } else if (sandwich.center[0].transaction_type === "remove") {
+    let centerNameOut = sandwich.center[0].coins_leaving_wallet[0]?.name ?? "";
     centerMessage = `${hyperlink(CENTER_TX_HASH_URL_ETHERSCAN, "Center")}: removed ${formatForPrint(centerAmountOut)}${hyperlink(centerCoinOutUrl!, centerNameOut)}`;
   }
 
   let lossStatement;
   if (value && !isNaN(value)) {
+    const monetaryLoss = (percentage / 100) * value;
     lossStatement = `${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(
       lostCoinOutUrl,
       lostCoinNameOut
-    )} (that's -${percentage}% slippage)`;
+    )} (that's -${percentage}% slippage, or $${monetaryLoss.toFixed(2)})`;
   } else {
     lossStatement = `${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(
       lostCoinOutUrl,
