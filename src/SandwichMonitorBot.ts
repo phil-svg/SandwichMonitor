@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { telegramBotMain } from "./utils/telegram/TelegramBot.js";
+import { buildSandwichMessage, telegramBotMain } from "./utils/telegram/TelegramBot.js";
 import { connectToWebsocket } from "./utils/websocket/SandwichWebsocket.js";
 
 console.clear();

@@ -1,11 +1,5 @@
 import { buildSandwichMessage } from "../../utils/telegram/TelegramBot.js";
 import { io } from "socket.io-client";
-var TransactionType;
-(function (TransactionType) {
-    TransactionType["Swap"] = "swap";
-    TransactionType["Deposit"] = "deposit";
-    TransactionType["Remove"] = "remove";
-})(TransactionType || (TransactionType = {}));
 //const url = "http://localhost:443";
 const url = "wss://api.curvemonitor.com";
 export async function connectToWebsocket(eventEmitter) {

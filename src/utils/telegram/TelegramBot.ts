@@ -2,7 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 import dotenv from "dotenv";
 import { EventEmitter } from "events";
 import { labels } from "../../Labels.js";
-import { SandwichDetail } from "../websocket/SandwichWebsocket.js";
+import { SandwichDetails } from "../websocket/SandwichWebsocket.js";
 dotenv.config({ path: "../.env" });
 
 function getTokenURL(tokenAddress: string): string {
@@ -118,8 +118,8 @@ function getAddressName(address: string): string {
   return labelObject ? labelObject.Label : shortenAddress(address);
 }
 
-export async function buildSandwichMessage(sandwich: SandwichDetail) {
-  let value = sandwich.lossInUsd;
+export async function buildSandwichMessage(sandwich: SandwichDetails) {
+  let value = parseFloat(sandwich.lossInUsd);
   const POOL_URL_ETHERSCAN = getPoolURL(sandwich.poolAddress);
   const POOL_NAME = sandwich.poolName;
   const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
@@ -191,11 +191,10 @@ export async function buildSandwichMessage(sandwich: SandwichDetail) {
 
   let lossStatement;
   if (value && !isNaN(value)) {
-    const monetaryLoss = (percentage / 100) * value;
     lossStatement = `${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(
       lostCoinOutUrl,
       lostCoinNameOut
-    )} (that's -${percentage}% slippage, or $${monetaryLoss.toFixed(2)})`;
+    )} (that's -${percentage}% slippage, or $${value.toFixed(2)})`;
   } else {
     lossStatement = `${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(
       lostCoinOutUrl,

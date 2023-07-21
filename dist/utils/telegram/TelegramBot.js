@@ -111,7 +111,7 @@ function getAddressName(address) {
 }
 export async function buildSandwichMessage(sandwich) {
     var _a, _b, _c, _d, _e, _f, _g, _h;
-    let value = sandwich.lossInUsd;
+    let value = parseFloat(sandwich.lossInUsd);
     const POOL_URL_ETHERSCAN = getPoolURL(sandwich.poolAddress);
     const POOL_NAME = sandwich.poolName;
     const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
@@ -177,8 +177,7 @@ export async function buildSandwichMessage(sandwich) {
     }
     let lossStatement;
     if (value && !isNaN(value)) {
-        const monetaryLoss = (percentage / 100) * value;
-        lossStatement = `${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's -${percentage}% slippage, or $${monetaryLoss.toFixed(2)})`;
+        lossStatement = `${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's -${percentage}% slippage, or $${value.toFixed(2)})`;
     }
     else {
         lossStatement = `${hyperlink(centerBuyerURL, shortenCenterBuyer)} lost ${formatForPrint(lostAmount)}${hyperlink(lostCoinOutUrl, lostCoinNameOut)} (that's -${percentage}% slippage)`;
