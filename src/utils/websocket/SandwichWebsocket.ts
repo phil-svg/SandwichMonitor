@@ -38,7 +38,7 @@ export interface SandwichDetails {
   label: string;
   poolAddress: string;
   poolName: string;
-  lossInUsd: string;
+  lossInUsd: number;
 }
 
 //const url = "http://localhost:443";

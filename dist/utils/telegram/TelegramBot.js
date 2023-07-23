@@ -111,7 +111,7 @@ function getAddressName(address) {
 }
 export async function buildSandwichMessage(sandwich) {
     var _a, _b, _c, _d, _e, _f, _g, _h;
-    let value = parseFloat(sandwich.lossInUsd);
+    let value = sandwich.lossInUsd;
     const POOL_URL_ETHERSCAN = getPoolURL(sandwich.poolAddress);
     const POOL_NAME = sandwich.poolName;
     const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
