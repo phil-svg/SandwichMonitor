@@ -20,12 +20,8 @@ function getBuyerURL(buyerAddress) {
 function formatForPrint(someNumber) {
     if (typeof someNumber === "string" && someNumber.includes(","))
         return someNumber;
-    //someNumber = Math.abs(someNumber);
     if (someNumber > 100) {
         someNumber = Number(Number(someNumber).toFixed(0)).toLocaleString();
-    }
-    else if (someNumber > 5) {
-        someNumber = Number(Number(someNumber).toFixed(2)).toLocaleString();
     }
     else {
         someNumber = Number(Number(someNumber).toFixed(2)).toLocaleString();
@@ -116,6 +112,8 @@ export async function buildSandwichMessage(sandwich) {
     const POOL_NAME = sandwich.poolName;
     const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
     let labelName = sandwich.label;
+    if (labelName === "Metamask: Swap Router")
+        labelName = "Metamask: Clown Router";
     let CENTER_TX_HASH_URL_ETHERSCAN, centerAmountOut, centerNameOut, centerAmountIn, centerNameIn;
     let centerCoinInUrl = "";
     let centerCoinOutUrl = "";
