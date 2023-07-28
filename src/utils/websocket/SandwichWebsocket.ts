@@ -41,7 +41,7 @@ export interface SandwichDetails {
   lossInUsd: number;
 }
 
-//const url = "http://localhost:443";
+// const url = "http://localhost:443";
 const url = "wss://api.curvemonitor.com";
 
 export async function connectToWebsocket(eventEmitter: any) {

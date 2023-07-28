@@ -121,7 +121,7 @@ export async function buildSandwichMessage(sandwich: SandwichDetails) {
   const POOL_NAME = sandwich.poolName;
   const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
   let labelName = sandwich.label;
-  if (labelName === "Metamask: Swap Router") labelName = "Metamask: Clown Router";
+  // if (labelName === "Metamask: Swap Router") labelName = "Metamask: Clown Router";
   let CENTER_TX_HASH_URL_ETHERSCAN, centerAmountOut, centerNameOut, centerAmountIn, centerNameIn;
   let centerCoinInUrl = "";
   let centerCoinOutUrl = "";
