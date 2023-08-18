@@ -97,10 +97,10 @@ export function send(bot: any, message: string, groupID: number) {
   // Track the message as sent
   sentMessages[key] = true;
 
-  // Delete the message from tracking after 30 seconds
+  // Delete the message from tracking after 5 minutes
   setTimeout(() => {
     delete sentMessages[key];
-  }, 30000); // 30000 ms = 30 seconds
+  }, 5 * 60 * 1000);
 }
 
 function shortenAddress(address: string): string {
