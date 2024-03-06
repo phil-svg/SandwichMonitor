@@ -35,52 +35,62 @@ function formatForPrint(someNumber: any) {
   return someNumber;
 }
 
-function getShortenNumber(amountStr: any) {
-  let amount = parseFloat(amountStr.replace(/,/g, ""));
-  //amount = roundToNearest(amount);
-  if (amount >= 1000000) {
-    const millionAmount = amount / 1000000;
-    if (Number.isInteger(millionAmount)) {
-      return `${millionAmount.toFixed(0)}M`;
-    } else {
-      return `${millionAmount.toFixed(2)}M`;
-    }
-  } else if (amount >= 1000) {
-    const thousandAmount = amount / 1000;
-    if (Number.isInteger(thousandAmount)) {
-      return `${thousandAmount.toFixed(0)}k`;
-    } else {
-      return `${thousandAmount.toFixed(1)}k`;
-    }
-  } else {
-    return `${amount.toFixed(2)}`;
-  }
-}
-
-function getDollarAddOn(amountStr: any) {
-  let amount = parseFloat(amountStr.replace(/,/g, ""));
-  //amount = roundToNearest(amount);
-  if (amount >= 1000000) {
-    const millionAmount = amount / 1000000;
-    if (Number.isInteger(millionAmount)) {
-      return ` ($${millionAmount.toFixed(0)}M)`;
-    } else {
-      return ` ($${millionAmount.toFixed(2)}M)`;
-    }
-  } else if (amount >= 1000) {
-    const thousandAmount = amount / 1000;
-    if (Number.isInteger(thousandAmount)) {
-      return ` ($${thousandAmount.toFixed(0)}k)`;
-    } else {
-      return ` ($${thousandAmount.toFixed(1)}k)`;
-    }
-  } else {
-    return ` ($${amount.toFixed(2)})`;
-  }
-}
-
 function hyperlink(link: string, name: string): string {
   return "<a href='" + link + "/'> " + name + "</a>";
+}
+
+function getBlockUrlEtherscan(blockNumber: number): string {
+  return "https://etherscan.io/block/" + blockNumber;
+}
+
+function getBlockLinkEtherscan(blockNumber: number): string {
+  const url = getBlockUrlEtherscan(blockNumber);
+  const link = hyperlink(url, blockNumber.toString());
+  return link;
+}
+
+function formatExecutionPrice(price: number): string {
+  if (price > 100) {
+    // For numbers greater than 100, round to 2 decimal places
+    return price.toFixed(2);
+  } else if (price < 1) {
+    const priceStr = price.toString();
+    // Check if price is less than 1 and starts with leading 9's after the decimal point
+    const leading9sMatch = priceStr.match(/0\.9*/);
+    if (leading9sMatch) {
+      const leading9s = leading9sMatch[0];
+      // Calculate the number of characters to include: all leading 9's plus two more digits
+      const endIndex = leading9s.length + 3;
+      // Extract the substring and parse it to ensure correct rounding
+      return parseFloat(priceStr.substring(0, endIndex)).toString();
+    } else {
+      // If there are no leading 9's, round to 4 decimal places
+      return price.toFixed(4);
+    }
+  } else {
+    // For numbers between 1 and 100, round to 4 decimal places
+    return price.toFixed(4);
+  }
+}
+
+function findUnderstandableExecutionPriceAndDenomination(priceA: number, priceB: number, coinLeavingWalletName: string, coinEnteringWalletName: string): [string, string] {
+  let price = 0;
+  let denomination = "";
+
+  if (priceA > 2) {
+    price = priceA;
+    denomination = `${coinEnteringWalletName}/${coinLeavingWalletName}`;
+  } else if (priceB > 2) {
+    price = priceB;
+    denomination = `${coinLeavingWalletName}/${coinEnteringWalletName}`;
+  } else {
+    price = Math.min(priceA, priceB);
+    // Decide the denomination based on which price (A or B) is smaller
+    denomination = price === priceA ? `${coinLeavingWalletName}/${coinEnteringWalletName}` : `${coinEnteringWalletName}/${coinLeavingWalletName}`;
+  }
+
+  const formattedPrice = formatExecutionPrice(price);
+  return [formattedPrice, denomination.toLowerCase()]; // Return both values as an array
 }
 
 let sentMessages: Record<string, boolean> = {};
@@ -121,10 +131,17 @@ export async function buildSandwichMessage(sandwich: SandwichDetails) {
   const POOL_NAME = sandwich.poolName;
   const LABEL_URL_ETHERSCAN = getPoolURL(sandwich.center[0].called_contract_by_user);
   let labelName = sandwich.label;
+  if (labelName.startsWith("0x") && labelName.length === 42) {
+    labelName = shortenAddress(labelName);
+  }
   // if (labelName === "Metamask: Swap Router") labelName = "Metamask: Clown Router";
   let CENTER_TX_HASH_URL_ETHERSCAN, centerAmountOut, centerNameOut, centerAmountIn, centerNameIn;
   let centerCoinInUrl = "";
   let centerCoinOutUrl = "";
+
+  const blockNumber = sandwich.backrun.block_number;
+  const blockLinkEtherscan = getBlockLinkEtherscan(blockNumber);
+  let priceAndBlocknumberTag = `Block:${blockLinkEtherscan} | Index Frontrun: ${sandwich.frontrun.tx_position}`;
 
   const FRONTRUN_TX_HASH_URL_ETHERSCAN = getTxHashURLfromEtherscan(sandwich.frontrun.tx_hash);
   let frontrunAmountOut = sandwich.frontrun.coins_leaving_wallet[0].amount;
@@ -136,17 +153,25 @@ export async function buildSandwichMessage(sandwich: SandwichDetails) {
 
   CENTER_TX_HASH_URL_ETHERSCAN = getTxHashURLfromEtherscan(sandwich.center[0].tx_hash);
 
+  const centerTxCoinLeavingDetails = sandwich.center[0].coins_leaving_wallet[0];
+  const centerTxCoinEnteringDetails = sandwich.center[0].coins_entering_wallet[0];
+
   if (sandwich.center[0].transaction_type === "swap") {
-    centerAmountOut = sandwich.center[0].coins_leaving_wallet[0].amount;
-    centerCoinOutUrl = getTokenURL(sandwich.center[0].coins_leaving_wallet[0].address);
-    centerNameOut = sandwich.center[0].coins_leaving_wallet[0].name;
-    centerAmountIn = sandwich.center[0].coins_entering_wallet[0].amount;
-    centerCoinInUrl = getTokenURL(sandwich.center[0].coins_entering_wallet[0].address);
-    centerNameIn = sandwich.center[0].coins_entering_wallet[0].name;
+    centerAmountOut = centerTxCoinLeavingDetails.amount;
+    centerCoinOutUrl = getTokenURL(centerTxCoinLeavingDetails.address);
+    centerNameOut = centerTxCoinLeavingDetails.name;
+    centerAmountIn = centerTxCoinEnteringDetails.amount;
+    centerCoinInUrl = getTokenURL(centerTxCoinEnteringDetails.address);
+    centerNameIn = centerTxCoinEnteringDetails.name;
+
+    let priceA = Number(centerTxCoinLeavingDetails.amount) / Number(centerTxCoinEnteringDetails.amount);
+    let priceB = Number(centerTxCoinEnteringDetails.amount) / Number(centerTxCoinLeavingDetails.amount);
+    let [executionPrice, denominationTag] = findUnderstandableExecutionPriceAndDenomination(priceA, priceB, centerTxCoinLeavingDetails.name, centerTxCoinEnteringDetails.name);
+    priceAndBlocknumberTag = `Execution Price Center: ${executionPrice} (${denominationTag})\nBlock:${blockLinkEtherscan} | Index Frontrun: ${sandwich.frontrun.tx_position}`;
   } else if (sandwich.center[0].transaction_type === "deposit") {
-    centerAmountIn = sandwich.center[0].coins_entering_wallet[0].amount;
-    centerCoinInUrl = getTokenURL(sandwich.center[0].coins_entering_wallet[0].address);
-    centerNameIn = sandwich.center[0].coins_entering_wallet[0].name;
+    centerAmountIn = centerTxCoinEnteringDetails.amount;
+    centerCoinInUrl = getTokenURL(centerTxCoinEnteringDetails.address);
+    centerNameIn = centerTxCoinEnteringDetails.name;
   } else if (sandwich.center[0].transaction_type === "remove") {
     centerAmountOut = sandwich.center[0].coins_leaving_wallet[0].amount;
     centerCoinOutUrl = getTokenURL(sandwich.center[0].coins_leaving_wallet[0].address);
@@ -211,6 +236,7 @@ ${hyperlink(BACKRUN_TX_HASH_URL_ETHERSCAN, "Backrun")}: ${formatForPrint(backrun
     backrunAmountIn
   )}${hyperlink(backrunCoinInUrl, backrunNameIn)}
 
+${priceAndBlocknumberTag}
 Affected Contract: ${LABEL}
 
 ${lossStatement}

@@ -1,7 +1,6 @@
+import { url } from "../../SandwichMonitorBot.js";
 import { buildSandwichMessage } from "../../utils/telegram/TelegramBot.js";
 import { io } from "socket.io-client";
-// const url = "http://localhost:443";
-const url = "wss://api.curvemonitor.com";
 export async function connectToWebsocket(eventEmitter) {
     const mainSocket = io(`${url}/main`);
     mainSocket.on("connect", () => {
