@@ -79,10 +79,10 @@ function findUnderstandableExecutionPriceAndDenomination(priceA: number, priceB:
 
   if (priceA > 2) {
     price = priceA;
-    denomination = `${coinEnteringWalletName}/${coinLeavingWalletName}`;
+    denomination = `${coinLeavingWalletName}/${coinEnteringWalletName}`;
   } else if (priceB > 2) {
     price = priceB;
-    denomination = `${coinLeavingWalletName}/${coinEnteringWalletName}`;
+    denomination = `${coinEnteringWalletName}/${coinLeavingWalletName}`;
   } else {
     price = Math.min(priceA, priceB);
     // Decide the denomination based on which price (A or B) is smaller

@@ -70,11 +70,11 @@ function findUnderstandableExecutionPriceAndDenomination(priceA, priceB, coinLea
     let denomination = "";
     if (priceA > 2) {
         price = priceA;
-        denomination = `${coinEnteringWalletName}/${coinLeavingWalletName}`;
+        denomination = `${coinLeavingWalletName}/${coinEnteringWalletName}`;
     }
     else if (priceB > 2) {
         price = priceB;
-        denomination = `${coinLeavingWalletName}/${coinEnteringWalletName}`;
+        denomination = `${coinEnteringWalletName}/${coinLeavingWalletName}`;
     }
     else {
         price = Math.min(priceA, priceB);
